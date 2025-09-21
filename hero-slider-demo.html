@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demostración del Hero Slider</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "DM Sans", Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    .preload {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #111;
+      color: #fff;
+      transition: opacity 300ms ease;
+      z-index: 999;
+    }
+
+    body.loaded .preload {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+
+    .navbar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .navbar-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-toggle-btn {
+      display: none;
+    }
+
+    .overlay {
+      display: none;
+    }
+
+    main {
+      min-height: 100vh;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 80vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .hero-slider {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: relative;
+      width: min(1100px, 90vw);
+      height: 60vh;
+      max-height: 640px;
+      overflow: hidden;
+      border-radius: 1.25rem;
+    }
+
+    .slider-item {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 500ms ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slider-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.35));
+    }
+
+    .slider-item > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .slider-item.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin: 1rem 0;
+    }
+
+    .hero-text {
+      max-width: 48ch;
+      margin: 0 auto 1.5rem;
+    }
+
+    .hero .btn {
+      display: inline-flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      background: #d80650;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 200ms ease;
+    }
+
+    .slider-btn:hover {
+      background: rgba(216, 6, 80, 0.85);
+    }
+
+    .slider-btn.prev {
+      left: calc(5% - 1.5rem);
+    }
+
+    .slider-btn.next {
+      right: calc(5% - 1.5rem);
+    }
+
+    .back-top-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 3rem;
+      height: 3rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #d80650;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    @media (max-width: 720px) {
+      .navbar-list {
+        display: none;
+      }
+
+      .nav-toggle-btn {
+        display: inline-flex;
+        background: #d80650;
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Forum&display=swap" rel="stylesheet">
+</head>
+<body id="top">
+  <div class="preload" data-preaload>
+    <div class="circle">⏳</div>
+    <p class="text">Surco</p>
+  </div>
+
+  <header class="header" data-header>
+    <h1 style="margin: 0; font-family: 'Forum', serif;">Surco</h1>
+    <button class="nav-toggle-btn" data-nav-toggler type="button">Menú</button>
+    <nav class="navbar" data-navbar>
+      <button class="nav-toggle-btn" data-nav-toggler type="button">Cerrar</button>
+      <ul class="navbar-list">
+        <li><a class="navbar-link" href="#home">Inicio</a></li>
+        <li><a class="navbar-link" href="#sabores">Sabores</a></li>
+        <li><a class="navbar-link" href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="overlay" data-nav-toggler data-overlay></div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Demostración del slider" id="home">
+      <ul class="hero-slider" data-hero-slider>
+        <li class="slider-item active" data-hero-slider-item style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80');">
+          <p class="label-2 section-subtitle">Tradicional &amp; Higiénico</p>
+          <h2 class="hero-title">Por el amor a la comida deliciosa</h2>
+          <p class="hero-text">Ven con tu familia y siente la alegría de una comida exquisita en nuestra mesa.</p>
+          <a class="btn" href="#sabores">
+            <span class="text">Ver Nuestro Menú</span>
+          </a>
+        </li>
+        <li class="slider-item" data-hero-slider-item style="background-image: url('https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1600&q=80');">
+          <p class="label-2 section-subtitle">Experiencia deliciosa</p>
+          <h2 class="hero-title">Sabores inspirados en las estaciones</h2>
+          <p class="hero-text">Ingredientes frescos de temporada transformados en platos memorables.</p>
+          <a class="btn" href="#contacto">
+            <span class="text">Reservar Mesa</span>
+          </a>
+        </li>
+        <li class="slider-item" data-hero-slider-item style="background-image: url('https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=1600&q=80');">
+          <p class="label-2 section-subtitle">Increíble &amp; delicioso</p>
+          <h2 class="hero-title">Donde cada sabor cuenta una historia</h2>
+          <p class="hero-text">Una experiencia culinaria que deleita todos los sentidos.</p>
+          <a class="btn" href="#contacto">
+            <span class="text">Descubrir Más</span>
+          </a>
+        </li>
+      </ul>
+
+      <button class="slider-btn prev" aria-label="deslizar anterior" type="button" data-prev-btn>&lsaquo;</button>
+      <button class="slider-btn next" aria-label="deslizar siguiente" type="button" data-next-btn>&rsaquo;</button>
+    </section>
+  </main>
+
+  <a class="back-top-btn" href="#top" aria-label="volver arriba" data-back-top-btn>↑</a>
+
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
